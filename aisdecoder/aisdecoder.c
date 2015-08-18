@@ -36,7 +36,7 @@
 #include <stdio.h>
 //#include "config.h"
 #include "sounddecoder.h"
-#include "callbacks.h"
+#include "lib/callbacks.h"
 
 #define MAX_BUFFER_LENGTH 2048
 //#define MAX_BUFFER_LENGTH 8190
