@@ -1,43 +1,8 @@
-CFLAGS?=-O2 -g -Wall -W 
-CFLAGS+= -I./aisdecoder -I ./aisdecoder/lib
-LDFLAGS+=-lpthread -lm
-
-UNAME := $(shell uname)
-ifeq ($(UNAME),Linux)
-#Conditional for Linux
-CFLAGS+= $(shell pkg-config --cflags librtlsdr)
-LDFLAGS+=$(shell pkg-config --libs librtlsdr)
-
-else
-#
-#ADD THE CORRECT PATH FOR LIBUSB AND RTLSDR
-#TODO:
-#    CMAKE will be much better or create a conditional pkg-config
-
-
-# RTLSDR
-RTLSDR_INCLUDE=/tmp/rtl-sdr/include
-RTLSDR_LIB=/tmp/rtl-sdr/build/src
-
-# LIBUSB
-LIBUSB_INCLUDE=/tmp/libusb/include/libusb-1.0
-LIBUSB_LIB=/tmp/libusb/lib
-
-
-ifeq ($(UNAME),Darwin)
-#Conditional for OSX
-CFLAGS+= -I/usr/local/include/ -I$(LIBUSB_INCLUDE) -I$(RTLSDR_INCLUDE)
-LDFLAGS+= -L/usr/local/lib -L$(LIBUSB_LIB) -L$(RTLSDR_LIB) -lrtlsdr -lusb-1.0 
-else
-#Conditional for Windows
-CFLAGS+=-I $(LIBUSB_INCLUDE) -I $(RTLSDR_INCLUDE)
-LDFLAGS+=-L$(LIBUSB_INCLUDE) -L$(RTLSDR_LIB) -L/usr/lib -lusb-1.0 -lrtlsdr -lWs2_32
-endif
-
-
-endif
-
+CFLAGS?=-O2 -g -Wall -W $(shell pkg-config --cflags librtlsdr)
+LDLIBS+=$(shell pkg-config --libs librtlsdr) -lpthread -lm
 CC?=gcc
+
+
 SOURCES= \
 	rtl_ais.c convenience.c \
 	./aisdecoder/aisdecoder.c \
@@ -53,7 +18,7 @@ EXECUTABLE=rtl_ais
 all: $(SOURCES) $(EXECUTABLE)
     
 $(EXECUTABLE): $(OBJECTS) 
-	$(CC) $(OBJECTS) -o $@ $(LDFLAGS)
+	$(CC) $(OBJECTS) -o $@ $(LDFLAGS) $(LDLIBS)
 
 .c.o:
 	$(CC) -c $< -o $@ $(CFLAGS)
